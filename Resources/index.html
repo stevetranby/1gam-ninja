@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=800, initial-scale=1, maximum-scale=1">
+	<title>Charity Game Jam - Make games. Spread the love!</title>
+	<link rel="icon" type="image/GIF" href="res/favicon.ico"/>
+	<meta name="description" content="Charity Game Jam - Make games. Spread the love!">
+<style type='text/css'>
+body
+{
+	padding:0; margin:0; background:red;
+}
+</style>
+</head>
+<body style="padding:0; margin: 0; background: #000;">
+<div style="text-align: center;">
+		<canvas id="gameCanvas" width="512" height="448"></canvas>
+</div>
+</body>
+</html>
+<script src="cocos2d.js"></script>
+<script>
+function pressLeft(isdown) {
+		ST.KEYS[cc.KEY.left] = isdown;
+}
+function pressRight(isdown) {
+		ST.KEYS[cc.KEY.right] = isdown;
+}
+function pressUp(isdown) {
+		ST.KEYS[cc.KEY.up] = isdown;
+}
+function pressDown(isdown) {
+		ST.KEYS[cc.KEY.down] = isdown;
+}
+function pressA(isdown) {
+		ST.KEYS[cc.KEY.z] = isdown;
+}
+function pressB(isdown) {
+		ST.KEYS[cc.KEY.x] = isdown;
+}
+</script>
