@@ -35,272 +35,70 @@ var GameLayer = cc.Layer.extend({
 
 		loadOverworld:function (reloadMap)
 		{
-				var levelExited = this._inDungeonLevel;
-
-				// reset game state
-				this._inDungeonLevel = 0;
-				this._inDungeon = false;
-				this._state = STATE_PLAYING;
-				this._specialNotOpen = true;
-
-				this._player.retain();
-
-				if(reloadMap)
-				{
-						//tilemap
-						if(this._tileMap)
-						{
-								this._tileMap.removeFromParent();
-								this._tileMap = null;
-						}
-
-						this._tileMap = cc.TMXTiledMap.create(s_TilemapOverworld);
-						this.addChild(this._tileMap, -9);
-
-						this.mapSize = this._tileMap.getMapSize();
-						this.tileSize = this._tileMap.getTileSize();
-						this.screenRect = cc.rect(0, 0, this.mapSize.width * this.tileSize.width,
-																			this.mapSize.height * this.tileSize.height);
-
-						this.clearContainers();
-				}
-				else
-				{
-						this.clearEnemies();
-						this.clearContainers();
-				}
-
-				// player
-				if(this._player)
-				{
-						this._player.removeFromParent(false);
-						this._tileMap.addChild(this._player, this._player.zOrder, ST.UNIT_TAG.PLAYER);
-						
-						this._player.setAnchorPoint(cc.p(0.5,0.3));
-						this._player.setPosition(cc.p(100,this._tileMap.getTileSize().height * 3.5));
-						this._player.inDungeon = false;
-						this._player.tilemap = this._tileMap;
-						
-						// find last level, place at marker in tilemap
-						//levelExited
-				}
-
-				this._player.release();
-
-				// spawn test enemy
-				var enemyOptions = {
-						type:0,
-						//textureName:"E0.png",
-						//bulletType:"W2.png",
-						HP:2,
-						moveType:0,
-						attackDir:ST.DIR.EAST,
-						scoreValue:15
-				};
-
-				var thingsGroup = this._tileMap.getObjectGroup("Things");
-				var things = thingsGroup.getObjects();
-				var enemySpawns = [];
-
-				for(var i=0; i<things.length; i++)
-				{
-						var thing = things[i];
-						cc.log("thing with name = " + thing.name);
-						if(thing.type === "EnemySpawn")
-						{
-								var x = thing.x / thing.width;
-								var y = this.mapSize.height - (thing.y / thing.height + 2);
-
-								var tile = cc.p(x + 0.5, y + 0.5);
-								var pos = this._tileMap.getLayer(ST.LAYERS.META).getPositionAt(tile);
-
-								util.ccpLog(pos);
-
-								var addEnemy = new Enemy(enemyOptions);
-								addEnemy.setPosition(pos);
-								addEnemy.attackDir = Math.floor(Math.random() * 4.0);
-								this._tileMap.addChild(addEnemy, addEnemy.zOrder, ST.UNIT_TAG.ENEMY);
-								ST.CONTAINER.ENEMIES.push(addEnemy);
-						}
-				}
+			Loader.setupOverworld(this, reloadMap);
 		},
 
 		loadDungeon:function (level, reloadMap)
 		{
-				this._inDungeonLevel = level;
-				this._inDungeon = true;
-				this._state = STATE_PLAYING;
-
-				this._player.retain();
-
-				if(reloadMap)
-				{
-						//tilemap
-						if(this._tileMap)
-						{
-								cc.log("tilemap is being removed");
-								this._tileMap.removeFromParent();
-								this._tileMap = null;
-						}
-
-						if(level === 1)
-								this._tileMap = cc.TMXTiledMap.create(s_TilemapDungeon1);
-						if(level === 2)
-								this._tileMap = cc.TMXTiledMap.create(s_TilemapDungeon2);
-						if(level === 3)
-								this._tileMap = cc.TMXTiledMap.create(s_TilemapDungeon3);
-
-						cc.log("after trying to create tilemap => " + this._tileMap);
-
-						this.addChild(this._tileMap, -9);
-
-						this.mapSize = this._tileMap.getMapSize();
-						this.tileSize = this._tileMap.getTileSize();
-						this.screenRect = cc.rect(0, 0, this.mapSize.width * this.tileSize.width,
-																			this.mapSize.height * this.tileSize.height);
-
-						this.clearContainers();
-				}
-				else
-				{
-						this.clearEnemies();
-						this.clearContainers();
-				}
-
-				cc.log("getting ready to add the player back in");
-
-				// player
-				if(this._player && this._tileMap)
-				{
-						this._player.removeFromParent(false);
-						this._tileMap.addChild(this._player);//, this._player.zOrder, ST.UNIT_TAG.PLAYER);
-						this._player.tilemap = this._tileMap;
-				}
-
-				cc.log("repositioning player in new dungeon");
-				this._player.setAnchorPoint(cc.p(0.5,0.3));
-				this._player.setPosition(cc.p(100,this.tileSize.height * 3.3));
-				this._player.inDungeon = true;
-
-				// spawn test enemy
-				var enemyOptions = {
-						type:0,
-						//textureName:"E0.png",
-						//bulletType:"W2.png",
-						HP:2,
-						moveType:0,
-						attackDir:ST.DIR.WEST,
-						scoreValue:15
-				};
-
-				cc.log("setting up enemies");
-
-				var enemyTiles = [[14,6],[25,6],[33,9],[42,9],[48,6],[58,8],[72,9],
-													[80,5],[101,3],[115,4],[115,5],[115,6]];
-				for(var i=0; i < enemyTiles.length; i++)
-				{
-						var enemyTile = enemyTiles[i];
-						var x = enemyTile[0];
-						var y = enemyTile[1];
-						var addEnemy = new Enemy(enemyOptions);
-						addEnemy.setPosition(cc.p(this.tileSize.width * (x+0.5), this.tileSize.height * (y+0.5)));
-						this._tileMap.addChild(addEnemy, addEnemy.zOrder, ST.UNIT_TAG.ENEMY);
-						ST.CONTAINER.ENEMIES.push(addEnemy);
-						cc.log("enemy added at tile = " + x + "," + y + "; pos = " + addEnemy.getPosition() + ", enemys.length = " + ST.CONTAINER.ENEMIES.length);
-				}
-
-				this._player.release();
+			Loader.setupDungeon(this, level, reloadMap);
 		},
 
 		initHUD:function ()
 		{
-				cc.log("init HUD");
-
-				// layer
-				this._hudLayer = cc.LayerColor.create(cc.BLACK,winSize.width,16);
-				this._hudLayer.setPosition(cc.p(0,winSize.height-16));
-				this.addChild(this._hudLayer, 10000);
-
-				// score
-				cc.log("setup score");
-				this._scoreLabel = cc.LabelTTF.create("Score: 000000", "Arial", 8, cc.size(300,8), cc.TEXT_ALIGNMENT_LEFT);
-				this._scoreLabel.setPosition(cc.p(205,1));
-				this._scoreLabel.setAnchorPoint(cc.p(0,0));
-				this._hudLayer.addChild(this._scoreLabel, 5);
-
-				// complete
-				cc.log("setup complete");
-				this._levelsLabel = cc.LabelTTF.create("Complete: 00%", "Arial", 8, cc.size(300,8), cc.TEXT_ALIGNMENT_LEFT);
-				this._levelsLabel.setPosition(cc.p(140,1));
-				this._levelsLabel.setAnchorPoint(cc.p(0,0));
-				this._hudLayer.addChild(this._levelsLabel, 5);
-
-				// health
-				cc.log("setup health");
-				this._healthLabel = cc.LabelTTF.create("Health: ######", "Arial", 8, cc.size(300,8), cc.TEXT_ALIGNMENT_LEFT);
-				this._healthLabel.setPosition(cc.p(50,1));
-				this._healthLabel.setAnchorPoint(cc.p(0,0));
-				this._hudLayer.addChild(this._healthLabel, 5);
-
-				// lives
-				cc.log("setup lives");
-				this._livesLabel = cc.LabelTTF.create("Lives: 3", "Arial", 8, cc.size(300,8), cc.TEXT_ALIGNMENT_LEFT);
-				this._livesLabel.setPosition(cc.p(10,1));
-				this._livesLabel.setAnchorPoint(cc.p(0,0));
-				this._hudLayer.addChild(this._livesLabel, 5);
+			Hud.setup(this);
 		},
 
 		init:function ()
 		{
-				var selfPointer = this;
-				this.name = "GameLayer";
-				this._inDungeon = false;
+			var selfPointer = this;
+			this.name = "GameLayer";
+			this._inDungeon = false;
 
-				ST.WON = false;
-				ST.SCORE = 0;
-				ST.LIFE = 3;
-				ST.LevelCompleted = [];
+			ST.WON = false;
+			ST.SCORE = 0;
+			ST.LIFE = 3;
+			ST.LevelCompleted = [];
 
-				//////////////////////////////
-				// 1. super init first
-				this._super();
+			//////////////////////////////
+			// 1. super init first
+			this._super();
 
-				// ask director the window size
-				winSize = cc.Director.getInstance().getWinSize();
+			// ask director the window size
+			winSize = cc.Director.getInstance().getWinSize();
 
-				// player
-				this._player = new Player();
+			// player
+			this._player = new Player();
 
-				this.initHUD();
-				this.loadOverworld(true);
+			this.initHUD();
+			this.loadOverworld(true);
 
-				// Setup Window and Input
-				this.setTouchEnabled(true);
-				
-				if(this.setKeypadEnabled)
-					this.setKeypadEnabled(true);
+			// Setup Window and Input
+			this.setTouchEnabled(true);
+			
+			if(this.setKeypadEnabled)
+				this.setKeypadEnabled(true);
 
-				// accept touch now!
-				var t = sys.platform;
-				if( t == 'browser' )
-				{
-						this.setTouchEnabled(true);
-						this.setKeyboardEnabled(true);
-				}
-				else if( t == 'desktop' )
-				{
-						this.setMouseEnabled(true);
-				}
-				else if( t == 'mobile' )
-				{
-						this.setTouchEnabled(true);
-				}
+			// accept touch now!
+			var t = sys.platform;
+			if( t == 'browser' )
+			{
+					this.setTouchEnabled(true);
+					this.setKeyboardEnabled(true);
+			}
+			else if( t == 'desktop' )
+			{
+					this.setMouseEnabled(true);
+			}
+			else if( t == 'mobile' )
+			{
+					this.setTouchEnabled(true);
+			}
 
-				this._state = STATE_PLAYING;
-				// schedule
-				this.scheduleUpdate();
+			this._state = STATE_PLAYING;
+			// schedule
+			this.scheduleUpdate();
 
-				return true;
+			return true;
 		},
 
 		// a selector callback

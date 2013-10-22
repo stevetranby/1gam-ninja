@@ -32,6 +32,8 @@ var appFiles = [
     'src/config/config.js',
     'src/config/resources.js',
     'src/config/utils.js',
+    'src/Hud.js',
+    'src/Loader.js',
     'src/GameOver.js',
     'src/SysMenu.js',
     'src/GameLayer.js',

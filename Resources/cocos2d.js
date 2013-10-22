@@ -36,7 +36,7 @@ var ST = ST || {};
         showFPS:true,
         frameRate:30,
         loadExtension:true,
-        renderMode:0,       //Choose of RenderMode: 0(default), 1(Canvas only), 2(WebGL only)
+        renderMode:1,       //Choose of RenderMode: 0(default), 1(Canvas only), 2(WebGL only)
         tag:'gameCanvas', //the dom element to run cocos2d on
         engineDir:'',//'lib/cocos2d/',
         SingleEngineFile:'lib/Cocos2d-html5-v2.1.5.min.js',
@@ -44,6 +44,8 @@ var ST = ST || {};
             'src/config/config.js',
             'src/config/resources.js',
             'src/config/utils.js',
+            'src/Hud.js',
+            'src/Loader.js',
             'src/GameOver.js',
             'src/SysMenu.js',
             'src/GameLayer.js',
